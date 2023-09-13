@@ -16,7 +16,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class LoginController {
     constructor(private loginService: LoginService){}
    
-    @UseGuards(LocalAuthGuard)
+    //@UseGuards(LocalAuthGuard)
     @Post('login')
     @ApiResponse({status: 401, description: 'Incorrect CPF or Password!'})
     @ApiResponse({status: 400, description: 'Malformed request. Check the sent data.'})
