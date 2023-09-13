@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
@@ -14,6 +15,7 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(AuthGuard())
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<User[]> {
     return this.userService.findAll()
