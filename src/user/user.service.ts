@@ -37,6 +37,10 @@ export class UserService {
     catch (error) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
   }
 
+  async findByIndex(index: number): Promise<User | null> {
+    return this.userModel.findOne().skip(index - 1).exec();
+  }
+
   public async deleteById(id: string): Promise<User> {
     const document = await this.findById(id)
     if (!document) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
 import { AuthGuard } from '@nestjs/passport';
+import { Types } from 'mongoose';
 
 @Controller('user')
 export class UserController {
@@ -21,13 +22,24 @@ export class UserController {
     return this.userService.findAll()
   }
 
-  @Get(':id')
-  public async findById(@Param('id') id: string) {
-    try {
-      const document = await this.userService.findById(id)
-      return document
-    } catch (error) {
-      throw new NotFoundException(error.message)
+  @Get(':param')
+  async getUser(@Param('param') param: string) {
+    if (Types.ObjectId.isValid(param)) {
+      const user = await this.userService.findById(param)
+      if (!user) {
+        throw new NotFoundException(`Usuário com id ${param} não encontrado`)
+      }
+      return user
+    } else {
+      const index = parseInt(param, 10)
+      if (isNaN(index) || index < 1) {
+        throw new BadRequestException('Index inválido')
+      }
+      const user = await this.userService.findByIndex(index)
+      if (!user) {
+        throw new NotFoundException(`Usuário em index ${index} não encontrado`)
+      }
+      return user
     }
   }
 
