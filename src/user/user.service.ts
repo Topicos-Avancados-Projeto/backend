@@ -16,12 +16,12 @@ export class UserService {
     private jwtService: JwtService,
   ) { }
 
-  public async create(user_post_schema: User_post_schema): Promise<{ token: string, name: string, email: string, cpf: string, id: any }> {
+  public async create(user_post_schema: User_post_schema): Promise<{ token: string, user: { name: string, email: string, cpf: string, id: any, date_of_birth: string } }> {
     const { name, cpf, email, password, date_of_birth } = user_post_schema
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth })
-    const token = this.jwtService.sign({ id: user._id })
-    return { id: user.id, name, cpf, email, token }
+    const token = this.jwtService.sign({ cpf })
+    return { token, user: { id: user.id, name, cpf, email, date_of_birth } }
   }
 
   public async findAll(): Promise<User[]> {

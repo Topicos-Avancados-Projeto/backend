@@ -1,22 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException, Headers, Header } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  public async create(@Body() User_post_schema: User_post_schema): Promise<{ token: string }> {
-    return this.userService.create(User_post_schema)
+  public async create(
+    @Body() user_post_schema: User_post_schema,
+    @Headers('token') headers: Record<string, any>
+  ) {
+    const user = await this.userService.create(user_post_schema)
+    return user
   }
 
   @Get()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<User[]> {
     return this.userService.findAll()
@@ -48,7 +54,7 @@ export class UserController {
     try {
       const deletedDocument = await this.userService.deleteById(id)
       return deletedDocument
-    } 
+    }
     catch (error) { throw new NotFoundException(error.message) }
   }
 
