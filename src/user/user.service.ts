@@ -16,12 +16,32 @@ export class UserService {
     private jwtService: JwtService,
   ) { }
 
-  public async create(user_post_schema: User_post_schema): Promise<{ token: string, user: { name: string, email: string, cpf: string, id: any, date_of_birth: string } }> {
-    const { name, cpf, email, password, date_of_birth } = user_post_schema
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth })
-    const token = this.jwtService.sign({ cpf })
-    return { token, user: { id: user.id, name, cpf, email, date_of_birth } }
+  private async isCpfUnique(cpf: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ cpf }).exec();
+    return !user;
+  }
+
+  public async create(user_post_schema: User_post_schema): Promise<{ 
+    token: string, 
+    user: { 
+      name: string, 
+      email: string, 
+      cpf: string, 
+      id: any, 
+      date_of_birth: string 
+    } 
+  }> {
+    const { name, cpf, email, password, date_of_birth } = user_post_schema;
+
+    if (!name || !cpf || !email || !password || !date_of_birth) {
+      throw new BadRequestException('Validation problem')
+    }
+    if (!(await this.isCpfUnique(cpf))) { throw new BadRequestException('CPF already exists!') }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth });
+    const token = this.jwtService.sign({ cpf });
+    return { token, user: { id: user.id, name, cpf, email, date_of_birth } };
   }
 
   public async findAll(): Promise<User[]> {
@@ -33,7 +53,7 @@ export class UserService {
       const document = await this.userModel.findById(id).exec()
       if (!document) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
       return document
-    } 
+    }
     catch (error) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
   }
 
