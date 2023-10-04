@@ -10,7 +10,7 @@ import { BrokerClientModule } from './broker-client/broker-client.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-    MongooseModule.forRoot(process.env.ATLAS_URI),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
     LoginModule,
     BrokerClientModule

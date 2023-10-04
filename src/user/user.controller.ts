@@ -14,7 +14,7 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiResponse({status: 409, description: 'User alread exists'})
+  @ApiResponse({ status: 409, description: 'User alread exists' })
   public async create(@Body() user_post_schema: User_post_schema, @Res({ passthrough: true }) res: Response) {
     const user = await this.userService.create(user_post_schema)
     res.set('Authorization', user.token)
@@ -34,38 +34,61 @@ export class UserController {
     if (Types.ObjectId.isValid(param)) {
       const user = await this.userService.findById(param)
       if (!user) {
-        throw new NotFoundException(`Usuário com id ${param} não encontrado`)
+        throw new NotFoundException(`User not found.`)
       }
       return user
     } else {
       const index = parseInt(param, 10)
       if (isNaN(index) || index < 1) {
-        throw new BadRequestException('Index inválido')
+        throw new BadRequestException('Invalid index')
       }
       const user = await this.userService.findByIndex(index)
       if (!user) {
-        throw new NotFoundException(`Usuário em index ${index} não encontrado`)
+        throw new NotFoundException(`User not found.`)
       }
       return user
     }
   }
 
-  @Delete(':id')
-  public async deleteById(@Param('id') id: string) {
-    try {
-      const deletedDocument = await this.userService.deleteById(id)
-      return deletedDocument
+  @Patch(':param')
+  public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
+    if (Types.ObjectId.isValid(param)) {
+      const updatedDocument = await this.userService.patchById(param, partialUpdate);
+      if (!updatedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return updatedDocument;
+    } else {
+      const index = parseInt(param, 10);
+      if (isNaN(index) || index < 1) {
+        throw new BadRequestException('Invalid index');
+      }
+      const updatedDocument = await this.userService.patchByIndex(index, partialUpdate);
+      if (!updatedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return updatedDocument;
     }
-    catch (error) { throw new NotFoundException(error.message) }
   }
 
-  @Patch(':id')
-  public async patchById(@Param('id') id: string, @Body() partialUpdate: Partial<User>) {
-    try {
-      const updatedDocument = await this.userService.patchById(id, partialUpdate)
-      return updatedDocument
-    } catch (error) {
-      throw new NotFoundException(error.message)
+  @Delete(':param')
+  public async delete(@Param('param') param: string) {
+    if (Types.ObjectId.isValid(param)) {
+      const deletedDocument = await this.userService.deleteById(param);
+      if (!deletedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return deletedDocument;
+    } else {
+      const index = parseInt(param, 10);
+      if (isNaN(index) || index < 1) {
+        throw new BadRequestException('Index inválido');
+      }
+      const deletedDocument = await this.userService.deleteByIndex(index);
+      if (!deletedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return deletedDocument;
     }
   }
 }

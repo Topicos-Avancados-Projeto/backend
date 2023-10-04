@@ -26,12 +26,12 @@ export class UserService {
     return !user;
   }
 
-  public async create(user_post_schema: User_post_schema): Promise<{ 
-    token: string, 
-    name: string, 
-    email: string, 
-    cpf: string, 
-    id: any, 
+  public async create(user_post_schema: User_post_schema): Promise<{
+    token: string,
+    name: string,
+    email: string,
+    cpf: string,
+    id: any,
     date_of_birth: string
   }> {
     const { name, cpf, email, password, date_of_birth } = user_post_schema
@@ -60,6 +60,25 @@ export class UserService {
 
   async findByIndex(index: number): Promise<User | null> {
     return this.userModel.findOne().skip(index - 1).exec();
+  }
+
+  async patchByIndex(index: number, partialUpdate: Partial<User>): Promise<User | null> {
+    const user = await this.userModel.findOne().skip(index - 1).exec();
+    if (!user) {
+      return null;
+    }
+    Object.assign(user, partialUpdate);
+    await user.save();
+    return user;
+  }
+
+  async deleteByIndex(index: number): Promise<User | null> {
+    const user = await this.userModel.findOne().skip(index - 1).exec();
+    if (!user) {
+      return null;
+    }
+    await user.deleteOne();
+    return user;
   }
 
   public async deleteById(id: string): Promise<User> {
