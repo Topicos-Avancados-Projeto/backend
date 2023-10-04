@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException, Headers, Header } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
 import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @ApiTags('user')
 @Controller('user')
@@ -13,12 +14,11 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  public async create(
-    @Body() user_post_schema: User_post_schema,
-    @Headers('token') headers: Record<string, any>
-  ) {
+  public async create(@Body() user_post_schema: User_post_schema, @Res({ passthrough: true }) res: Response) {
     const user = await this.userService.create(user_post_schema)
-    return user
+    res.set('Authorization', user.token)
+    const { token, ...body } = user
+    return body
   }
 
   @Get()
