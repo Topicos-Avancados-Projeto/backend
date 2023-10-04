@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schemas';
 import { Model } from 'mongoose';
@@ -35,7 +35,7 @@ export class UserService {
     date_of_birth: string
   }> {
     const { name, cpf, email, password, date_of_birth } = user_post_schema
-    if (!name || !cpf || !email || !password || !date_of_birth) { throw new BadRequestException('Validation problem') }
+    if (!name || !cpf || !email || !password || !date_of_birth) { throw new UnprocessableEntityException('Validation problem') }
     if (!(await this.isCpfUnique(cpf))) { throw new ConflictException('CPF already exists!') }
     if (!(await this.isEmailUnique(email))) { throw new ConflictException('Email alread exists') }
     const hashedPassword = await bcrypt.hash(password, 10)

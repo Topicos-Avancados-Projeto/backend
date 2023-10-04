@@ -72,6 +72,7 @@ export class UserController {
   }
 
   @Delete(':param')
+  @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(@Param('param') param: string) {
     if (Types.ObjectId.isValid(param)) {
       const deletedDocument = await this.userService.deleteById(param);
