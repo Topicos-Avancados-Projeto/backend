@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, NotFoundException, UseGuards, BadRequestException, Res, HttpException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
@@ -51,25 +51,29 @@ export class UserController {
   }
 
   @Patch(':param')
-  public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
-    if (Types.ObjectId.isValid(param)) {
-      const updatedDocument = await this.userService.patchById(param, partialUpdate);
-      if (!updatedDocument) {
-        throw new NotFoundException(`User not found.`);
-      }
-      return updatedDocument;
-    } else {
-      const index = parseInt(param, 10);
-      if (isNaN(index) || index < 1) {
-        throw new BadRequestException('Invalid index');
-      }
-      const updatedDocument = await this.userService.patchByIndex(index, partialUpdate);
-      if (!updatedDocument) {
-        throw new NotFoundException(`User not found.`);
-      }
-      return updatedDocument;
-    }
+public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
+  if (Object.keys(partialUpdate).length === 0) {
+    throw new HttpException('No update parameters provided.', HttpStatus.UNPROCESSABLE_ENTITY);
   }
+
+  if (Types.ObjectId.isValid(param)) {
+    const updatedDocument = await this.userService.patchById(param, partialUpdate);
+    if (!updatedDocument) {
+      throw new NotFoundException(`User not found.`);
+    }
+    return updatedDocument;
+  } else {
+    const index = parseInt(param, 10);
+    if (isNaN(index) || index < 1) {
+      throw new BadRequestException('Invalid index');
+    }
+    const updatedDocument = await this.userService.patchByIndex(index, partialUpdate);
+    if (!updatedDocument) {
+      throw new NotFoundException(`User not found.`);
+    }
+    return updatedDocument;
+  }
+}
 
   @Delete(':param')
   @HttpCode(HttpStatus.NO_CONTENT)

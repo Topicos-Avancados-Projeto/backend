@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schemas';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
 import { User_post_schema } from './dto/create-user.dto';
@@ -68,9 +68,16 @@ export class UserService {
       return null;
     }
     Object.assign(user, partialUpdate);
-    await user.save();
+    try {
+      await user.save();
+    } catch (error) {
+      if (error instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException('Validation problem.');
+      }
+      throw error;
+    }
     return user;
-  }
+}
 
   async deleteByIndex(index: number): Promise<User | null> {
     const user = await this.userModel.findOne().skip(index - 1).exec();
@@ -83,14 +90,14 @@ export class UserService {
 
   public async deleteById(id: string): Promise<User> {
     const document = await this.findById(id)
-    if (!document) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
+    if (!document) { throw new NotFoundException(`User not found.`) }
     const deletedDocument = await this.userModel.findByIdAndRemove(id).exec()
     return deletedDocument;
   }
 
   public async patchById(id: string, partialUpdate: Partial<User>): Promise<User> {
     const document = await this.findById(id)
-    if (!document) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
+    if (!document) { throw new NotFoundException(`User not found.`) }
     Object.assign(document, partialUpdate)
     const updatedDocument = await document.save()
     return updatedDocument
