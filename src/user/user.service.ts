@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schemas';
 import { Model } from 'mongoose';
@@ -31,11 +31,12 @@ export class UserService {
   }> {
     const { name, cpf, email, password, date_of_birth } = user_post_schema
     if (!name || !cpf || !email || !password || !date_of_birth) { throw new BadRequestException('Validation problem') }
-    if (!(await this.isCpfUnique(cpf))) { throw new BadRequestException('CPF already exists!') }
+    if (!(await this.isCpfUnique(cpf))) { throw new ConflictException('CPF already exists!') }
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth })
+    if (!user) { throw new NotFoundException('User not found.') }
     const token = this.jwtService.sign({ cpf })
-    return { token, id: user.id, name, cpf, email, date_of_birth }
+    return { token, id: user._id, name, cpf, email, date_of_birth }
   }
 
   public async findAll(): Promise<User[]> {
@@ -44,11 +45,11 @@ export class UserService {
 
   public async findById(id: string): Promise<User> {
     try {
-      const document = await this.userModel.findById(id).exec()
-      if (!document) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
-      return document
+      const body = await this.userModel.findById(id).exec()
+      if (!body) { throw new NotFoundException(`User not found.`) }
+      return body
     }
-    catch (error) { throw new NotFoundException(`Document com ID ${id} não encontrado!`) }
+    catch (error) { throw new NotFoundException(`User not found.`) }
   }
 
   async findByIndex(index: number): Promise<User | null> {

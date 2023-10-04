@@ -4,7 +4,7 @@ import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('user')
@@ -14,6 +14,7 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status: 409, description: 'User alread exists'})
   public async create(@Body() user_post_schema: User_post_schema, @Res({ passthrough: true }) res: Response) {
     const user = await this.userService.create(user_post_schema)
     res.set('Authorization', user.token)
@@ -22,7 +23,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
+  //@UseGuards(AuthGuard())
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<User[]> {
     return this.userService.findAll()
