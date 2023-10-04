@@ -21,6 +21,11 @@ export class UserService {
     return !user;
   }
 
+  private async isEmailUnique(email: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ email }).exec();
+    return !user;
+  }
+
   public async create(user_post_schema: User_post_schema): Promise<{ 
     token: string, 
     name: string, 
@@ -32,6 +37,7 @@ export class UserService {
     const { name, cpf, email, password, date_of_birth } = user_post_schema
     if (!name || !cpf || !email || !password || !date_of_birth) { throw new BadRequestException('Validation problem') }
     if (!(await this.isCpfUnique(cpf))) { throw new ConflictException('CPF already exists!') }
+    if (!(await this.isEmailUnique(email))) { throw new ConflictException('Email alread exists') }
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth })
     if (!user) { throw new NotFoundException('User not found.') }
