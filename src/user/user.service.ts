@@ -72,7 +72,7 @@ export class UserService {
       await user.save();
     } catch (error) {
       if (error instanceof mongoose.Error.ValidationError) {
-        throw new UnprocessableEntityException('Validation problem.');
+        throw new UnprocessableEntityException('Validation Problem.');
       }
       throw error;
     }
