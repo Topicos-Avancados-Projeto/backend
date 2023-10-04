@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { BrokerClient } from './models/broker-client.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegisterDto } from './dtos/register.dto';
@@ -28,7 +28,13 @@ export class BrokerClientService {
     }
 
     const client = new this.clientModel(registerDto);
-    return client.save();
+    const savedClient = await client.save();
+
+    const clientOutput = savedClient.toObject();
+    clientOutput.id_client = clientOutput._id;
+    delete clientOutput._id;
+
+    return clientOutput;
   }
 
   public async findAll(): Promise<BrokerClient[]> {
@@ -45,8 +51,36 @@ export class BrokerClientService {
     return client;
   }
 
+  async findByIndex(index: number): Promise<BrokerClient | null> {
+    return this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+  }
+
   public async deleteById(_id: string): Promise<void> {
     const result = await this.clientModel.deleteOne({ _id });
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('Broker client not found.');
+    }
+  }
+
+  public async deleteByIndex(index: number): Promise<void> {
+    const clientToDelete = await this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+
+    if (!clientToDelete) {
+      throw new NotFoundException('Broker client not found.');
+    }
+
+    const result = await this.clientModel
+      .deleteOne({
+        _id: clientToDelete._id,
+      })
+      .exec();
 
     if (result.deletedCount === 0) {
       throw new NotFoundException('Broker client not found.');
@@ -57,8 +91,36 @@ export class BrokerClientService {
     _id: string,
     updateDto: DtoUpdate,
   ): Promise<BrokerClient> {
-    const client = await this.findById(_id);
+    const client = await this.clientModel.findById(_id);
+
+    if (!client) {
+      throw new NotFoundException('Broker client not found.');
+    }
+
     Object.assign(client, updateDto);
-    return client.save();
+
+    const updatedClient = await client.save();
+
+    return updatedClient;
+  }
+
+  public async updateByIndex(
+    index: number,
+    updateDto: DtoUpdate,
+  ): Promise<BrokerClient> {
+    const client = await this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+
+    if (!client) {
+      throw new NotFoundException('Broker client not found.');
+    }
+
+    Object.assign(client, updateDto);
+
+    const updatedClient = await client.save();
+
+    return updatedClient;
   }
 }

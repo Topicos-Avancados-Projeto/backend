@@ -3,10 +3,11 @@ import { QoSLevel } from '../dtos/qosEnum.dto';
 import { QoSLevelName } from '../dtos/qosName.dto';
 
 export interface BrokerClient extends Document {
+  id_client?: any;
   cleansession: boolean;
   name: string;
   description: string;
-  broker_por: number;
+  broker_port: number;
   broker_host: string;
   username: string;
   password: string;
