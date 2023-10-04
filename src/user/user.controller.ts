@@ -4,7 +4,7 @@ import { User_post_schema } from './dto/create-user.dto'
 import { User } from './schemas/user.schemas';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('user')
@@ -14,7 +14,6 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiResponse({ status: 409, description: 'User alread exists' })
   public async create(@Body() user_post_schema: User_post_schema, @Res({ passthrough: true }) res: Response) {
     const user = await this.userService.create(user_post_schema)
     res.set('Authorization', user.token)
@@ -51,29 +50,29 @@ export class UserController {
   }
 
   @Patch(':param')
-public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
-  if (Object.keys(partialUpdate).length === 0) {
-    throw new HttpException('No update parameters provided.', HttpStatus.UNPROCESSABLE_ENTITY);
-  }
+  public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
+    if (Object.keys(partialUpdate).length === 0) {
+      throw new HttpException('No update parameters provided.', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
-  if (Types.ObjectId.isValid(param)) {
-    const updatedDocument = await this.userService.patchById(param, partialUpdate);
-    if (!updatedDocument) {
-      throw new NotFoundException(`User not found.`);
+    if (Types.ObjectId.isValid(param)) {
+      const updatedDocument = await this.userService.patchById(param, partialUpdate);
+      if (!updatedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return updatedDocument;
+    } else {
+      const index = parseInt(param, 10);
+      if (isNaN(index) || index < 1) {
+        throw new BadRequestException('Invalid index');
+      }
+      const updatedDocument = await this.userService.patchByIndex(index, partialUpdate);
+      if (!updatedDocument) {
+        throw new NotFoundException(`User not found.`);
+      }
+      return updatedDocument;
     }
-    return updatedDocument;
-  } else {
-    const index = parseInt(param, 10);
-    if (isNaN(index) || index < 1) {
-      throw new BadRequestException('Invalid index');
-    }
-    const updatedDocument = await this.userService.patchByIndex(index, partialUpdate);
-    if (!updatedDocument) {
-      throw new NotFoundException(`User not found.`);
-    }
-    return updatedDocument;
   }
-}
 
   @Delete(':param')
   @HttpCode(HttpStatus.NO_CONTENT)
