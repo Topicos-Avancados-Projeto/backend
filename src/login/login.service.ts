@@ -17,21 +17,18 @@ export class LoginService {
     async validateUser(loginDto: login_post_schema): Promise<{name: string, id: any, email: string}>{
         const {cpf, password} = loginDto;
         const login = await this.userModel.findOne({cpf});
-
+        if (password.length < 6 || cpf.length < 14) { 
+            throw new UnprocessableEntityException('Malformed request. Check the sent data') 
+        }
         if(!login || !(await bcrypt.compare(password, login.password) )){
             throw new UnauthorizedException('Incorrect CPF or Password!');
         }
         if (!cpf || !password) { 
             throw new UnprocessableEntityException('Validation Problem') 
         }
-        if (password.length < 6 || cpf.length < 11) { 
-            throw new UnprocessableEntityException('Malformed request. Check the sent data') 
-        }
-
-
         return {id: login.id, name: login.name, email: login.email};;
     }
-
+    
     generateToken(user: any){
         const token = this.jwtService.sign({id: user._id});
         return {token}
