@@ -2,18 +2,19 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schemas';
 import mongoose, { Model } from 'mongoose';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
 import { User_post_schema } from './dto/create-user.dto';
 import { JwtPayload } from './jwt/jwt-payload.model';
 import { Request } from 'express';
+import { LoginService } from 'src/login/login.service';
+import { Role } from 'src/login/enum/roles.enum';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel('User')
     private userModel: Model<User>,
-    private jwtService: JwtService,
+    private loginService: LoginService,
   ) { }
 
   private async isCpfUnique(cpf: string): Promise<boolean> {
@@ -39,9 +40,9 @@ export class UserService {
     if (!(await this.isCpfUnique(cpf))) { throw new ConflictException('CPF already exists!') }
     if (!(await this.isEmailUnique(email))) { throw new ConflictException('Email alread exists') }
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth })
+    const user = await this.userModel.create({ name, cpf, email, password: hashedPassword, date_of_birth, role: Role.USER })
     if (!user) { throw new NotFoundException('User not found.') }
-    const token = this.jwtService.sign({ cpf })
+    const { token } = this.loginService.generateToken({id: user._id, name: user.name, role: user.role});
     return { token, id: user._id, name, cpf, email, date_of_birth }
   }
 
