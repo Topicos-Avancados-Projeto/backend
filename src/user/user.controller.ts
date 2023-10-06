@@ -10,10 +10,12 @@ import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
 import { Public } from 'src/login/decorator/publid.auth.decorator';
 import { Role } from 'src/login/enum/roles.enum';
 import { Roles } from 'src/login/decorator/roles.decorator';
+import { OwnerChecker } from 'src/login/decorator/ownership.checker.decorator';
+import { UserOwnershipChecker } from 'src/login/owner/user.ownerShip.checker';
 
 @ApiTags('user')
 @Controller('user')
-@JwtAuth(Role.ADMIN)
+@JwtAuth()
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
@@ -28,14 +30,16 @@ export class UserController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<User[]> {
     return this.userService.findAll()
   }
 
-  @Get(':param')
-  @Roles(Role.ADMIN, Role.USER)
-  async getUser(@Param('param') param: string) {
+  @Get(':id')
+  @Roles(Role.ADMIN, Role.OWNER)
+  @OwnerChecker(UserOwnershipChecker)
+  async getUser(@Param('id') param: string) {
     if (Types.ObjectId.isValid(param)) {
       const user = await this.userService.findById(param)
       if (!user) {
@@ -55,9 +59,10 @@ export class UserController {
     }
   }
 
-  @Patch(':param')
-  @Roles(Role.ADMIN, Role.USER)
-  public async patch(@Param('param') param: string, @Body() partialUpdate: Partial<User>) {
+  @Patch(':id')
+  @Roles(Role.ADMIN, Role.OWNER)
+  @OwnerChecker(UserOwnershipChecker)
+  public async patch(@Param('id') param: string, @Body() partialUpdate: Partial<User>) {
     if (Object.keys(partialUpdate).length === 0) {
       throw new HttpException('No update parameters provided.', HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -81,10 +86,11 @@ export class UserController {
     }
   }
 
-  @Delete(':param')
-  @Roles(Role.ADMIN, Role.USER)
+  @Delete(':id')
+  @Roles(Role.ADMIN, Role.OWNER)
+  @OwnerChecker(UserOwnershipChecker)
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async delete(@Param('param') param: string) {
+  public async delete(@Param('id') param: string) {
     if (Types.ObjectId.isValid(param)) {
       const deletedDocument = await this.userService.deleteById(param);
       if (!deletedDocument) {
