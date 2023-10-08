@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LoginModule } from './login/login.module';
 import { BrokerClientModule } from './broker-client/broker-client.module';
+import { APP_FILTER } from '@nestjs/core';
+import { CustomExceptionFilter } from './broker-client/filters/custom-exception.filter';
 
 @Module({
   imports: [
@@ -13,9 +15,15 @@ import { BrokerClientModule } from './broker-client/broker-client.module';
     MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
     LoginModule,
-    BrokerClientModule
+    BrokerClientModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: CustomExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
