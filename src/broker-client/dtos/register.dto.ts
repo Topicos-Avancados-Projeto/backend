@@ -7,11 +7,13 @@ import {
 } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 import { QoSLevel } from './qosEnum.dto';
+import { IsNotEmptyTrimmed } from '../decorator/exception.trim.decorator';
 
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly user_id: string;
 
   @IsNotEmpty()
@@ -22,6 +24,7 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly name: string;
 
   @IsString()
@@ -31,21 +34,25 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsNumber()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly broker_port: number;
 
   @IsNotEmpty()
   @IsString()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly broker_host: string;
 
   @IsString()
   @IsNotEmpty()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly username: string;
 
   @IsNotEmpty()
   @IsString()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly password: string;
 
   @IsString()
@@ -55,6 +62,7 @@ export class RegisterDto {
   @IsNotEmpty()
   @Prop({ required: true })
   @IsEnum(QoSLevel)
+  @IsNotEmptyTrimmed()
   readonly lastwillqos: QoSLevel;
 
   @IsString()
@@ -68,5 +76,6 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsNumber()
   @Prop({ required: true })
+  @IsNotEmptyTrimmed()
   readonly keepalive: number;
 }

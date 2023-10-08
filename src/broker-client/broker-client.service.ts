@@ -34,9 +34,7 @@ export class BrokerClientService {
     }
 
     if (existingClient) {
-      throw new ConflictException(
-        'Broker client with the same username already exists.',
-      );
+      throw new ConflictException('Broker client already exists.');
     }
 
     const client = new this.clientModel(registerDto);
@@ -70,7 +68,7 @@ export class BrokerClientService {
     const client = await this.clientModel.findOne({ _id });
 
     if (!client) {
-      throw new NotFoundException(`Usuário com id ${_id} não encontrado`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     return client;
@@ -83,7 +81,7 @@ export class BrokerClientService {
       .exec();
 
     if (!client) {
-      throw new NotFoundException(`Usuário em index ${index} não encontrado`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     return client;
@@ -93,7 +91,7 @@ export class BrokerClientService {
     const result = await this.clientModel.deleteOne({ _id });
 
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Broker Client with id ${_id} not found.`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
   }
 
@@ -104,7 +102,7 @@ export class BrokerClientService {
       .exec();
 
     if (!clientToDelete) {
-      throw new NotFoundException(`Broker Client at index ${index} not found.`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     const result = await this.clientModel
@@ -112,7 +110,7 @@ export class BrokerClientService {
       .exec();
 
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Broker Client at index ${index} not found.`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
   }
 
@@ -126,15 +124,13 @@ export class BrokerClientService {
     });
 
     if (existingClient) {
-      throw new ConflictException(
-        'Broker client with the same username already exists.',
-      );
+      throw new ConflictException('Broker client already exists.');
     }
 
     const client = await this.clientModel.findById(_id);
 
     if (!client) {
-      throw new NotFoundException(`Broker Client with id ${_id} not found.`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     Object.assign(client, updateDto);
@@ -152,7 +148,7 @@ export class BrokerClientService {
       .exec();
 
     if (!client) {
-      throw new NotFoundException(`Broker Client at index ${index} not found.`);
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     let existingClient;
@@ -161,9 +157,7 @@ export class BrokerClientService {
     });
 
     if (existingClient) {
-      throw new ConflictException(
-        'Broker client with the same username already exists.',
-      );
+      throw new ConflictException('Broker client already exists.');
     }
 
     Object.assign(client, updateDto);
