@@ -18,12 +18,6 @@ import { CustomExceptionFilter } from './broker-client/filters/custom-exception.
     BrokerClientModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_FILTER,
-      useClass: CustomExceptionFilter,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

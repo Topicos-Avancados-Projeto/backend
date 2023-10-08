@@ -14,6 +14,7 @@ import {
   UnprocessableEntityException,
   NotFoundException,
   Res,
+  UseFilters,
 } from '@nestjs/common';
 import { BrokerClientService } from './broker-client.service';
 import { RegisterDto } from './dtos/register.dto';
@@ -21,8 +22,10 @@ import { BrokerClient } from './models/broker-client.model';
 import { DtoUpdate } from './dtos/update.dto';
 import { Types } from 'mongoose';
 import { Response } from 'express';
+import { CustomExceptionFilter } from './filters/custom-exception.filter';
 
 @Controller('broker_client')
+@UseFilters(CustomExceptionFilter)
 export class BrokerClientController {
   constructor(private readonly clientService: BrokerClientService) {}
 
