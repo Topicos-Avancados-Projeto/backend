@@ -1,30 +1,36 @@
 export class BaseException extends Error {
-    private readonly description;
+    private readonly response;
 
-    constructor(description: string | Record<string, any>) {
+    constructor(response: string | Record<string, any>) {
         super();
-        this.description = description;
+        this.response = response;
         this.extractMessage();
         this.extractName();
     }
 
     private extractMessage() {
-        if(typeof this.description === 'string') this.message = this.description;
-        else if(typeof this.description == 'object')
-        this.message = this.description.message;
+        if(typeof this.response === 'string') this.message = this.response;
+        else if(typeof this.response == 'object')
+        this.message = this.response.message;
     }
 
     private extractName() {
         this.name = this.constructor.name;
     }
 
-    public getDescription(): string | object {
-        return this.description
+    public getResponse(): string | object {
+        return this.response
     }
 }
 
-export class NotOwnershitCheckerException extends BaseException {
-    constructor(message = 'Resource Ownership Cheker nof found.') {
-        super({type: 'NotOwnershitCheckerException', message});
+export class NoOwnershitCheckerException extends BaseException {
+    constructor(message = 'Resource Ownership Cheker not found.') {
+        super({type: 'NoOwnershitCheckerException', message});
+    }
+}
+
+export class NoResourceToCheckException extends BaseException {
+    constructor(message = 'No Resource To Check.') {
+        super({type: 'NoResourceToCheckException', message});
     }
 }

@@ -13,13 +13,18 @@ import {
   ConflictException,
   UnprocessableEntityException,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { BrokerClientService } from './broker-client.service';
 import { RegisterDto } from './dtos/register.dto';
 import { BrokerClient } from './models/broker-client.model';
 import { DtoUpdate } from './dtos/update.dto';
+import { Roles } from 'src/login/decorator/roles.decorator';
+import { Role } from 'src/login/enum/roles.enum';
+import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
 
 @Controller('broker-client')
+@JwtAuth()
 export class BrokerClientController {
   constructor(private readonly clientService: BrokerClientService) {}
 
@@ -49,8 +54,10 @@ export class BrokerClientController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.OWNER)
   @HttpCode(HttpStatus.OK)
-  public async findAll(): Promise<BrokerClient[] | ErrorResponse> {
+  public async findAll(@Query() query): Promise<BrokerClient[] | ErrorResponse> {
+    //TODO: trasnformar a query em filtro e passar como parâmetro no userService.findAll
     try {
       const clients = await this.clientService.findAll();
       return clients;

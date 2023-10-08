@@ -5,7 +5,7 @@ import { Role } from "../enum/roles.enum";
 import { ROLES_KEY } from "../decorator/roles.decorator";
 import { ResourceOwnershipChecker } from "../interfaces/resource.ownership.checker";
 import { OWNER_CHECKER } from "../decorator/ownership.checker.decorator";
-import { NotOwnershitCheckerException } from "../exception/ownershipt.checker.exceptions";
+import { NoOwnershitCheckerException, NoResourceToCheckException } from "../exception/ownershipt.checker.exceptions";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -23,8 +23,12 @@ export class RolesGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
         const hasSomeRole = requiredRoles.some((role) => user.role === role);
-        if(!hasSomeRole && requiredRoles.includes(Role.OWNER)) {
+        if (!hasSomeRole && requiredRoles.includes(Role.OWNER)) {
             const resourceId = request.params?.id ? request.params?.id : null;
+            if (!resourceId && request.method === 'GET') {
+                this.fillOwnershipQueryParam(user, request);
+                return true;
+            }
             return this.checkOwnership(resourceId, user.id, ownershipMetadata);
         }
         return hasSomeRole;
@@ -44,16 +48,25 @@ export class RolesGuard implements CanActivate {
         ]);
     }
 
-    private checkOwnership(resourceId: any, userId: any, ownershipMetadata: ResourceOwnershipChecker | Type<ResourceOwnershipChecker> ): boolean {
-        if(!ownershipMetadata) {
-            throw new NotOwnershitCheckerException();
+    private checkOwnership(resourceId: any, userId: any, ownershipMetadata: ResourceOwnershipChecker | Type<ResourceOwnershipChecker>): boolean {
+
+        if (!ownershipMetadata) {
+            throw new NoOwnershitCheckerException();
         }
-        let ownershipChecker:ResourceOwnershipChecker = null;
-        if(typeof ownershipMetadata === 'object') {
+        if (!resourceId) {
+            throw new NoResourceToCheckException()
+        }
+        let ownershipChecker: ResourceOwnershipChecker = null;
+        if (typeof ownershipMetadata === 'object') {
             ownershipChecker = ownershipMetadata;
         } else {
             ownershipChecker = this.moduleRef.get(ownershipMetadata as Type<ResourceOwnershipChecker>);
         }
         return ownershipChecker.checkOwnership(resourceId, userId);
+    }
+
+    private fillOwnershipQueryParam(user, request): void {
+        if (!request.query) request.query = {};
+        request.query.owner = user.id;
     }
 }

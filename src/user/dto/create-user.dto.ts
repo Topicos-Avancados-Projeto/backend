@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator"
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator"
 
 export class User_post_schema {
     @IsNotEmpty()
@@ -22,4 +22,10 @@ export class User_post_schema {
     @IsNotEmpty()
     @IsString()
     readonly date_of_birth: string
+  }
+
+  export class UserQueryDto {
+    @IsOptional()
+    owner: any;
+
   }
