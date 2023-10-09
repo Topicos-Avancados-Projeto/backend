@@ -13,7 +13,7 @@ import { ErrorInterceptor } from './login/exception/ErrorInterceptor';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.ATLAS_URI),
     UserModule,
     LoginModule,
     BrokerClientModule
