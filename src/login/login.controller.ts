@@ -29,7 +29,7 @@ export class LoginController {
         return req.user;
     }
 
-    @Get('profile')
+    @Get()
     getProfile(@Req() req) {
         return req.user;
     }
