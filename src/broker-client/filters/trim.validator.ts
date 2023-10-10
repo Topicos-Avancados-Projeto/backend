@@ -10,11 +10,9 @@ export class IsNotEmptyTrimmedConstraint
   implements ValidatorConstraintInterface
 {
   validate(value: any, args: ValidationArguments) {
-    if (typeof value === 'string' && value.trim().length === 0) {
-      throw new UnprocessableEntityException();
-    } else if (
-      typeof value === 'number' &&
-      (value === null || value === undefined)
+    if (
+      (typeof value === 'string' && value.trim().length === 0) ||
+      (typeof value === 'number' && (value === null || value === undefined))
     ) {
       throw new UnprocessableEntityException();
     }

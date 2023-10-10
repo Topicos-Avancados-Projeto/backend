@@ -44,7 +44,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     response.status(status).json({
       statusCode: status,
-      message: msg,
+      msg: msg,
     });
   }
 }

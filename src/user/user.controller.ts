@@ -27,7 +27,7 @@ import { OwnerChecker } from 'src/login/decorator/ownership.checker.decorator';
 import { UserOwnershipChecker } from './owner/user.ownership.checker';
 
 @Controller('user')
-@JwtAuth()
+//@JwtAuth()
 @OwnerChecker(UserOwnershipChecker)
 export class UserController {
   constructor(private readonly userService: UserService) {}
