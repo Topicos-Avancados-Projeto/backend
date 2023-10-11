@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BrokerClientController } from './broker-client.controller';
 import { BrokerClientService } from './broker-client.service';
 import { BrokerClientSchema } from './schemas/broker-client.schema';
+import { APP_FILTER } from '@nestjs/core';
+import { CustomExceptionFilter } from './filters/custom-exception.filter';
 
 @Module({
   imports: [
@@ -14,6 +16,12 @@ import { BrokerClientSchema } from './schemas/broker-client.schema';
     ]),
   ],
   controllers: [BrokerClientController],
-  providers: [BrokerClientService],
+  providers: [
+    BrokerClientService,
+    {
+      provide: APP_FILTER,
+      useClass: CustomExceptionFilter,
+    },
+  ],
 })
 export class BrokerClientModule {}
