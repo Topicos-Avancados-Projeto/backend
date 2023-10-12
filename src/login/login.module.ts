@@ -16,30 +16,40 @@ import { AppValidationPipe } from './pipe/app.validation.pipe';
 
 @Global()
 @Module({
-  imports:[UserModule, PassportModule, 
+  imports: [
+    UserModule,
+    PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
           secret: config.get<string>('JWT_SECRET'),
           signOptions: {
-            expiresIn: config.get<string | number>('JWT_EXPIRES') },
+            expiresIn: config.get<string | number>('JWT_EXPIRES'),
+          },
         };
       },
     }),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],
-  providers: [LoginService, LocalStrategy, JwtStrategy,{
-    provide: APP_PIPE,
-    useClass: AppValidationPipe,
-  },{
-    provide: APP_FILTER,
-    useClass: AllExceptionsFilter,
-  }, {
-    provide: APP_FILTER,
-    useClass: AppBaseExceptionFilter,
-  }],
+  providers: [
+    LoginService,
+    LocalStrategy,
+    JwtStrategy,
+    {
+      provide: APP_PIPE,
+      useClass: AppValidationPipe,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AppBaseExceptionFilter,
+    },
+  ],
   controllers: [LoginController],
-  exports: [LoginService, LocalStrategy, JwtStrategy]
+  exports: [LoginService, LocalStrategy, JwtStrategy],
 })
 export class LoginModule {}

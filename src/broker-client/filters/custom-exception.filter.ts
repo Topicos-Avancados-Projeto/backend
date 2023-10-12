@@ -1,23 +1,15 @@
 import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  ConflictException,
-  UnprocessableEntityException,
-  UnauthorizedException,
-  ForbiddenException,
-  NotFoundException,
   HttpStatus,
+  ArgumentsHost,
+  ExceptionFilter,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch(
-  ConflictException,
-  UnprocessableEntityException,
-  UnauthorizedException,
-  ForbiddenException,
-  NotFoundException,
-)
 export class CustomExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -44,7 +36,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     response.status(status).json({
       statusCode: status,
-      message: msg,
+      msg: msg,
     });
   }
 }

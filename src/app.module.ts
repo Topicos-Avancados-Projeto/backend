@@ -13,7 +13,7 @@ import { BrokerClientModule } from './broker-client/broker-client.module';
     MongooseModule.forRoot(process.env.MONGO_URI),
     UserModule,
     LoginModule,
-    BrokerClientModule
+    BrokerClientModule,
   ],
   controllers: [AppController],
   providers: [AppService],

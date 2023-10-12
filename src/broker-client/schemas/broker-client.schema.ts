@@ -71,10 +71,11 @@ export const BrokerClientSchema = new mongoose.Schema(
   {
     toJSON: {
       virtuals: true,
-      versionKey: false,
       transform: function (doc, ret) {
         ret.id_client = ret._id.toString();
+        ret.version = ret.__v;
         delete ret._id;
+        delete ret.__v;
 
         if (ret.lastwillqos !== undefined) {
           ret.lastwillqos = {
