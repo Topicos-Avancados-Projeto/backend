@@ -1,9 +1,13 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
-import { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { BrokerClient } from './models/broker-client.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegisterDto } from './dtos/register.dto';
@@ -17,29 +21,67 @@ export class BrokerClientService {
   ) {}
 
   public async register(registerDto: RegisterDto): Promise<BrokerClient> {
-    const existingClient = await this.clientModel.findOne({
-      username: registerDto.username,
-    });
+    let existingClient;
 
-    if (existingClient) {
-      throw new ConflictException(
-        'Broker client with the same username already exists.',
+    try {
+      existingClient = await this.clientModel.findOne({
+        username: registerDto.username,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Failed to check for existing client.',
       );
     }
 
+    if (existingClient) {
+      throw new ConflictException('Broker client already exists.');
+    }
+
     const client = new this.clientModel(registerDto);
-    return client.save();
+
+    try {
+      return await client.save();
+    } catch (error) {
+      throw new UnprocessableEntityException('Failed to register the client.');
+    }
   }
 
   public async findAll(): Promise<BrokerClient[]> {
-    return this.clientModel.find();
+    try {
+      const clients = await this.clientModel.find();
+
+      if (!clients || clients.length === 0) {
+        throw new NotFoundException('No Broker Clients found.');
+      }
+
+      return clients;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException('Broker Client is not logged in!');
+      } else if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('Broker Client do not have permission!');
+      }
+    }
   }
 
   public async findById(_id: string): Promise<BrokerClient> {
     const client = await this.clientModel.findOne({ _id });
 
     if (!client) {
-      throw new NotFoundException('Broker client not found.');
+      throw new NotFoundException(`Broker Client does not exist.`);
+    }
+
+    return client;
+  }
+
+  public async findByIndex(index: number): Promise<BrokerClient> {
+    const client = await this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+
+    if (!client) {
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
 
     return client;
@@ -49,7 +91,26 @@ export class BrokerClientService {
     const result = await this.clientModel.deleteOne({ _id });
 
     if (result.deletedCount === 0) {
-      throw new NotFoundException('Broker client not found.');
+      throw new NotFoundException(`Broker Client does not exist.`);
+    }
+  }
+
+  public async deleteByIndex(index: number): Promise<void> {
+    const clientToDelete = await this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+
+    if (!clientToDelete) {
+      throw new NotFoundException(`Broker Client does not exist.`);
+    }
+
+    const result = await this.clientModel
+      .deleteOne({ _id: clientToDelete._id })
+      .exec();
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundException(`Broker Client does not exist.`);
     }
   }
 
@@ -57,8 +118,50 @@ export class BrokerClientService {
     _id: string,
     updateDto: DtoUpdate,
   ): Promise<BrokerClient> {
-    const client = await this.findById(_id);
+    let existingClient;
+    existingClient = await this.clientModel.findOne({
+      username: updateDto.username,
+    });
+
+    if (existingClient) {
+      throw new ConflictException('Broker client already exists.');
+    }
+
+    const client = await this.clientModel.findById(_id);
+
+    if (!client) {
+      throw new NotFoundException(`Broker Client does not exist.`);
+    }
+
     Object.assign(client, updateDto);
-    return client.save();
+    const updatedClient = await client.save();
+    return updatedClient;
+  }
+
+  public async updateByIndex(
+    index: number,
+    updateDto: DtoUpdate,
+  ): Promise<BrokerClient> {
+    const client = await this.clientModel
+      .findOne()
+      .skip(index - 1)
+      .exec();
+
+    if (!client) {
+      throw new NotFoundException(`Broker Client does not exist.`);
+    }
+
+    let existingClient;
+    existingClient = await this.clientModel.findOne({
+      username: updateDto.username,
+    });
+
+    if (existingClient) {
+      throw new ConflictException('Broker client already exists.');
+    }
+
+    Object.assign(client, updateDto);
+    const updatedClient = await client.save();
+    return updatedClient;
   }
 }
