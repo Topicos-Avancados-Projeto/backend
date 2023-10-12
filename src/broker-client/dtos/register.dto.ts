@@ -3,60 +3,79 @@ import {
   IsNotEmpty,
   IsString,
   IsNumber,
-  IsUUID,
-  ValidateNested,
+  IsEnum,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { UUID } from 'crypto';
-import { QoS } from './willqos.dto';
+import { Prop } from '@nestjs/mongoose';
+import { QoSLevel } from './qosEnum.dto';
+import { IsNotEmptyTrimmed } from '../decorator/exception.trim.decorator';
 
 export class RegisterDto {
   @IsNotEmpty()
-  @IsUUID()
-  userId: UUID;
+  @IsString()
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly user_id: string;
 
   @IsNotEmpty()
   @IsBoolean()
-  cleansession: boolean;
+  @Prop({ required: true })
+  readonly cleansession: boolean;
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly name: string;
 
   @IsString()
-  description: string;
+  @Prop({ required: true })
+  readonly description: string;
 
   @IsNotEmpty()
   @IsNumber()
-  broker_port: number;
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly broker_port: number;
 
   @IsNotEmpty()
   @IsString()
-  broker_host: string;
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly broker_host: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly username: string;
 
   @IsNotEmpty()
   @IsString()
-  username: string;
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly password: string;
+
+  @IsString()
+  @Prop({ required: true })
+  readonly lastwilltopic: string;
 
   @IsNotEmpty()
-  @IsString()
-  password: string;
+  @Prop({ required: true })
+  @IsEnum(QoSLevel)
+  @IsNotEmptyTrimmed()
+  readonly lastwillqos: QoSLevel;
 
   @IsString()
-  lastwilltopic: string;
-
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => QoS)
-  lastwillqos: QoS;
-
-  @IsString()
-  lastwillmessage: string;
+  @Prop({ required: true })
+  readonly lastwillmessage: string;
 
   @IsBoolean()
-  lastwillretain: boolean;
+  @Prop({ required: true })
+  readonly lastwillretain: boolean;
 
   @IsNotEmpty()
   @IsNumber()
-  keepalive: number;
+  @Prop({ required: true })
+  @IsNotEmptyTrimmed()
+  readonly keepalive: number;
 }

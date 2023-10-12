@@ -13,13 +13,19 @@ import {
   ConflictException,
   UnprocessableEntityException,
   NotFoundException,
+  Res,
+  UseFilters,
 } from '@nestjs/common';
 import { BrokerClientService } from './broker-client.service';
 import { RegisterDto } from './dtos/register.dto';
 import { BrokerClient } from './models/broker-client.model';
 import { DtoUpdate } from './dtos/update.dto';
+import { Types } from 'mongoose';
+import { Response } from 'express';
+import { CustomExceptionFilter } from './filters/custom-exception.filter';
 
-@Controller('broker-client')
+@Controller('broker_client')
+@UseFilters(CustomExceptionFilter)
 export class BrokerClientController {
   constructor(private readonly clientService: BrokerClientService) {}
 
@@ -27,138 +33,71 @@ export class BrokerClientController {
   @HttpCode(HttpStatus.CREATED)
   public async register(
     @Body() registerDto: RegisterDto,
-  ): Promise<BrokerClient | ErrorResponse> {
-    try {
-      const client = await this.clientService.register(registerDto);
-      return client;
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        throw new ConflictException({
-          status: HttpStatus.CONFLICT,
-          msg: 'Broker Client already exist!',
-        });
-      } else if (error instanceof UnprocessableEntityException) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          msg: 'Syntax Error!',
-        });
-      } else {
-        throw error;
-      }
-    }
+    @Res() response: Response,
+  ): Promise<void> {
+    const client = await this.clientService.register(registerDto);
+    const locationUri = `/Broker_Client/${client.id}`;
+    response.setHeader('Location', locationUri);
+    response.status(HttpStatus.CREATED).send(client);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  public async findAll(): Promise<BrokerClient[] | ErrorResponse> {
-    try {
-      const clients = await this.clientService.findAll();
-      return clients;
-    } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException({
-          status: HttpStatus.UNAUTHORIZED,
-          msg: 'Broker Client is not logged in!',
-        });
-      } else if (error instanceof ForbiddenException) {
-        throw new ForbiddenException({
-          status: HttpStatus.FORBIDDEN,
-          msg: 'Broker Client do not have permission!',
-        });
-      } else {
-        throw error;
-      }
+  public async findAll(): Promise<BrokerClient[]> {
+    const clients = await this.clientService.findAll();
+    return clients;
+  }
+
+  @Get(':param')
+  async getUser(@Param('param') param: string) {
+    const parsedParam = Types.ObjectId.isValid(param) ? param : null;
+    const index = !parsedParam ? parseInt(param, 10) : null;
+
+    if (parsedParam) {
+      return await this.clientService.findById(parsedParam);
+    } else if (!isNaN(index) && index >= 1) {
+      return await this.clientService.findByIndex(index);
+    } else {
+      throw new NotFoundException(
+        `Nenhum usuário encontrado para o parâmetro ${param}`,
+      );
     }
   }
 
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  public async findOne(
-    @Param('id') _id: string,
-  ): Promise<BrokerClient | ErrorResponse> {
-    try {
-      return await this.clientService.findById(_id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          msg: 'Broker Client not found.',
-        });
-      } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          msg: 'Validation Error (id must be a valid ObjectId)',
-        });
-      } else if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException({
-          status: HttpStatus.UNAUTHORIZED,
-          msg: 'Broker Client is not logged in!',
-        });
-      } else if (error instanceof ForbiddenException) {
-        throw new ForbiddenException({
-          status: HttpStatus.FORBIDDEN,
-          msg: 'Broker Client do not have permission!',
-        });
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  @Delete(':id')
+  @Delete(':param')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async delete(@Param('id') _id: string): Promise<void> {
-    try {
-      await this.clientService.deleteById(_id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          msg: 'Broker Client not found.',
-        });
-      } else if (error instanceof ForbiddenException) {
-        throw new ForbiddenException({
-          status: HttpStatus.FORBIDDEN,
-          msg: 'Do not have permission to remove!',
-        });
-      } else {
-        throw error;
-      }
+  public async delete(@Param('param') param: string): Promise<void> {
+    const parsedParam = Types.ObjectId.isValid(param) ? param : null;
+    const index = !parsedParam ? parseInt(param, 10) : null;
+
+    if (parsedParam) {
+      await this.clientService.deleteById(parsedParam);
+    } else if (!isNaN(index) && index >= 1) {
+      await this.clientService.deleteByIndex(index);
+    } else {
+      throw new NotFoundException(
+        `Nenhum usuário encontrado para o parâmetro ${param}`,
+      );
     }
   }
 
-  @Patch(':id')
-  @HttpCode(HttpStatus.OK)
+  @Patch(':param')
+  @HttpCode(HttpStatus.NO_CONTENT)
   public async update(
-    @Param('id') _id: string,
+    @Param('param') param: string,
     @Body() updateDto: DtoUpdate,
-  ): Promise<BrokerClient | ErrorResponse> {
-    try {
-      return await this.clientService.updateById(_id, updateDto);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException({
-          status: HttpStatus.NOT_FOUND,
-          msg: 'Broker Client not found.',
-        });
-      } else if (error instanceof ForbiddenException) {
-        throw new ForbiddenException({
-          status: HttpStatus.FORBIDDEN,
-          msg: 'Do not have permission to update!',
-        });
-      } else if (error instanceof ConflictException) {
-        throw new ConflictException({
-          status: HttpStatus.CONFLICT,
-          msg: 'In conflict with another process',
-        });
-      } else {
-        throw error;
-      }
+  ): Promise<BrokerClient> {
+    const parsedParam = Types.ObjectId.isValid(param) ? param : null;
+    const index = !parsedParam ? parseInt(param, 10) : null;
+
+    if (parsedParam) {
+      return await this.clientService.updateById(parsedParam, updateDto);
+    } else if (!isNaN(index) && index >= 1) {
+      return await this.clientService.updateByIndex(index, updateDto);
+    } else {
+      throw new NotFoundException(
+        `Nenhum usuário encontrado para o parâmetro ${param}`,
+      );
     }
   }
-}
-
-interface ErrorResponse {
-  status: number;
-  msg: string;
 }
