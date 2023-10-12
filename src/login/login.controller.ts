@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { LoginAuth } from './decorator/login.auth.decorator';
 import { JwtAuth } from './decorator/jwt.auth.decorator';
-import { Public } from './decorator/publid.auth.decorator';
+import { Public } from './decorator/public.auth.decorator';
 
 @ApiTags('Login')
 @Controller('login')

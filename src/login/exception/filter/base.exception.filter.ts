@@ -1,6 +1,6 @@
 import {ArgumentsHost, Catch, ExceptionFilter, HttpStatus,} from '@nestjs/common';
 import {Response} from 'express';
-import { BaseException } from '../ownershipt.checker.exceptions';
+import { BaseException } from '../ownership.checker.exceptions';
 
 @Catch(BaseException)
 export class AppBaseExceptionFilter implements ExceptionFilter {

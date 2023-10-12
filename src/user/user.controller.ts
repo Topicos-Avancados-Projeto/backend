@@ -20,14 +20,14 @@ import { Types } from 'mongoose';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
-import { Public } from 'src/login/decorator/publid.auth.decorator';
+import { Public } from 'src/login/decorator/public.auth.decorator';
 import { Role } from 'src/login/enum/roles.enum';
 import { Roles } from 'src/login/decorator/roles.decorator';
 import { OwnerChecker } from 'src/login/decorator/ownership.checker.decorator';
 import { UserOwnershipChecker } from './owner/user.ownership.checker';
 
 @Controller('user')
-//@JwtAuth()
+@JwtAuth()
 @OwnerChecker(UserOwnershipChecker)
 export class UserController {
   constructor(private readonly userService: UserService) {}
