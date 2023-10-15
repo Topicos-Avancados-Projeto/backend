@@ -14,7 +14,7 @@ import { OWNER_CHECKER } from '../decorator/ownership.checker.decorator';
 import {
   NoOwnershitCheckerException,
   NoResourceToCheckException,
-} from '../exception/ownershipt.checker.exceptions';
+} from '../exception/ownership.checker.exceptions';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

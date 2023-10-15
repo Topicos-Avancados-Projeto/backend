@@ -1,23 +1,15 @@
 import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  ConflictException,
-  UnprocessableEntityException,
-  UnauthorizedException,
-  ForbiddenException,
-  NotFoundException,
   HttpStatus,
+  ArgumentsHost,
+  ExceptionFilter,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch(
-  ConflictException,
-  UnprocessableEntityException,
-  UnauthorizedException,
-  ForbiddenException,
-  NotFoundException,
-)
 export class CustomExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -27,7 +19,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof ConflictException) {
       status = HttpStatus.CONFLICT;
-      msg = 'Broker Client already exists!';
+      msg = 'Broker Client Already exists!';
     } else if (exception instanceof UnprocessableEntityException) {
       status = HttpStatus.UNPROCESSABLE_ENTITY;
       msg = 'Syntax Error!';

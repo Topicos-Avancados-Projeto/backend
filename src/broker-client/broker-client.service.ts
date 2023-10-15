@@ -34,7 +34,7 @@ export class BrokerClientService {
     }
 
     if (existingClient) {
-      throw new ConflictException('Broker client already exists.');
+      throw new ConflictException('Broker client Already exists.');
     }
 
     const client = new this.clientModel(registerDto);
@@ -118,19 +118,20 @@ export class BrokerClientService {
     _id: string,
     updateDto: DtoUpdate,
   ): Promise<BrokerClient> {
-    let existingClient;
-    existingClient = await this.clientModel.findOne({
-      username: updateDto.username,
-    });
-
-    if (existingClient) {
-      throw new ConflictException('Broker client already exists.');
-    }
-
     const client = await this.clientModel.findById(_id);
 
     if (!client) {
       throw new NotFoundException(`Broker Client does not exist.`);
+    }
+
+    if (updateDto.username !== client.username) {
+      const existingClient = await this.clientModel.findOne({
+        username: updateDto.username,
+      });
+
+      if (existingClient) {
+        throw new ConflictException('Broker client Already exists!');
+      }
     }
 
     Object.assign(client, updateDto);
@@ -151,13 +152,14 @@ export class BrokerClientService {
       throw new NotFoundException(`Broker Client does not exist.`);
     }
 
-    let existingClient;
-    existingClient = await this.clientModel.findOne({
-      username: updateDto.username,
-    });
+    if (updateDto.username !== client.username) {
+      const existingClient = await this.clientModel.findOne({
+        username: updateDto.username,
+      });
 
-    if (existingClient) {
-      throw new ConflictException('Broker client already exists.');
+      if (existingClient) {
+        throw new ConflictException('Broker client Already exists!');
+      }
     }
 
     Object.assign(client, updateDto);

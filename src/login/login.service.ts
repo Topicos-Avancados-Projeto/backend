@@ -1,4 +1,4 @@
-import { Injectable, Redirect, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from "bcryptjs";
 import { login_post_schema } from './dto/login_post_schema.dto';

@@ -1,33 +1,32 @@
 import {
-  Controller,
   Get,
+  Res,
   Post,
   Body,
   Patch,
   Param,
   Delete,
   HttpCode,
+  Controller,
   HttpStatus,
+  HttpException,
   NotFoundException,
   BadRequestException,
-  Res,
-  HttpException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User_post_schema } from './dto/create-user.dto';
 import { User } from './schemas/user.schemas';
 import { Types } from 'mongoose';
-import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
-import { Public } from 'src/login/decorator/publid.auth.decorator';
+import { Public } from 'src/login/decorator/public.auth.decorator';
 import { Role } from 'src/login/enum/roles.enum';
 import { Roles } from 'src/login/decorator/roles.decorator';
 import { OwnerChecker } from 'src/login/decorator/ownership.checker.decorator';
 import { UserOwnershipChecker } from './owner/user.ownership.checker';
 
 @Controller('user')
-//@JwtAuth()
+@JwtAuth()
 @OwnerChecker(UserOwnershipChecker)
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -40,7 +39,7 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.userService.create(user_post_schema);
-    res.set('Authorization', 'Bearer ' + user.token);
+    res.set('Authorization', user.token);
     const { token, ...body } = user;
     return body;
   }
@@ -49,7 +48,8 @@ export class UserController {
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<User[]> {
-    return this.userService.findAll();
+    const body = this.userService.findAll();
+    return body;
   }
 
   @Get(':id')
