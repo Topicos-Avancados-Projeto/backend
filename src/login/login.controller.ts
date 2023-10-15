@@ -21,8 +21,9 @@ export class LoginController {
     return req.user;
   }
 
+  @LoginAuth()
   @Get()
-  getProfile(@Req() req) {
+  async getProfile(@Req() req): Promise<{id: any, name: string, email: string}>{
     return req.user;
   }
 }
