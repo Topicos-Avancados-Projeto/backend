@@ -15,7 +15,7 @@ export class LoginService {
         private jwtService: JwtService
     ){}
 
-    async validateUser(loginDto: login_post_schema): Promise<{name: string, id: any, email: string, role: Role}>{
+    async validateUser(loginDto: login_post_schema): Promise<{name: string, id: any, email: string}>{
         const {cpf, password} = loginDto;
         const login = await this.userModel.findOne({cpf})
         if (password.length < 6 || cpf.length < 14) { 
@@ -25,7 +25,7 @@ export class LoginService {
             throw new UnauthorizedException('Incorrect CPF or Password!');
         }
         
-        return {id: login._id, name: login.name, email: login.email, role: login.role};
+        return {id: login._id, name: login.name, email: login.email};
     }
     
     generateToken(user: any){
