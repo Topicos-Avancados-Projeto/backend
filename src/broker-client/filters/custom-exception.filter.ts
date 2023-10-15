@@ -27,7 +27,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof ConflictException) {
       status = HttpStatus.CONFLICT;
-      msg = 'Broker Client already exists!';
+      msg = 'Broker Client Already exists!';
     } else if (exception instanceof UnprocessableEntityException) {
       status = HttpStatus.UNPROCESSABLE_ENTITY;
       msg = 'Syntax Error!';
