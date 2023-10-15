@@ -43,10 +43,21 @@ export class UserService {
     date_of_birth: string;
   }> {
     const { name, cpf, email, password, date_of_birth } = user_post_schema;
-    if (cpf.length < 14) {
-      throw new UnprocessableEntityException('CPF must be cpf')
+    if (cpf.length > 3 && cpf.length < 14) {
+      throw new UnprocessableEntityException('CPF must be cpf');
     }
-    if (!name || !cpf || !email || !password || !date_of_birth) {
+    if (
+      !name ||
+      !cpf ||
+      !email ||
+      !password ||
+      !date_of_birth ||
+      name.length <= 3 ||
+      cpf.length < 3 ||
+      email.length <= 3 ||
+      password.length <= 6 ||
+      date_of_birth.length <= 3
+    ) {
       throw new UnprocessableEntityException('Validation problem');
     }
     if (!(await this.isCpfUnique(cpf))) {
