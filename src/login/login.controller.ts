@@ -18,12 +18,12 @@ export class LoginController {
   async peformLogin(@Req() req, @Res({ passthrough: true }) res: Response) {
     const login = await this.loginService.generateToken(req.user);
     res.set('Authorization', login.token);
-    return req.user;
+    return {id: req.user.id, name: req.user.name, email: req.user.email};
   }
 
   @LoginAuth()
   @Get()
-  async getProfile(@Req() req): Promise<{id: any, name: string, email: string}>{
-    return req.user;
+  getProfile(@Req() req){
+    return {id: req.user.id, name: req.user.name, email: req.user.email};
   }
 }
