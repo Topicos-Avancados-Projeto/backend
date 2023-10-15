@@ -31,7 +31,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       msg = 'Broker Client do not have permission!';
     } else if (exception instanceof NotFoundException) {
       status = HttpStatus.NOT_FOUND;
-      msg = exception.message;
+      msg = 'Broker Client not found.';
     }
 
     response.status(status).json({
