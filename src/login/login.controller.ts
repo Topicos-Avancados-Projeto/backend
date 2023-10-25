@@ -7,7 +7,6 @@ import { JwtAuth } from './decorator/jwt.auth.decorator';
 import { Public } from './decorator/public.auth.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { Role } from './enum/roles.enum';
-import { User } from 'src/user/schemas/user.schemas'
 
 @ApiTags('Login')
 @Controller('login')

@@ -5,7 +5,6 @@ import { login_post_schema } from './dto/login_post_schema.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/user/schemas/user.schemas';
 import { Model } from 'mongoose';
-import { Role } from './enum/roles.enum';
 
 @Injectable()
 export class LoginService {
