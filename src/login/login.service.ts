@@ -32,4 +32,9 @@ export class LoginService {
         const token = this.jwtService.sign({sub: user.id, name: user.name, role: user.role});
         return {token}
     }
+
+    async getingUserById(id: any){
+        const login = await this.userModel.findById(id);
+        return login;
+    }
 }

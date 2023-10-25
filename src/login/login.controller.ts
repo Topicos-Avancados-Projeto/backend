@@ -5,6 +5,9 @@ import { Response } from 'express';
 import { LoginAuth } from './decorator/login.auth.decorator';
 import { JwtAuth } from './decorator/jwt.auth.decorator';
 import { Public } from './decorator/public.auth.decorator';
+import { Roles } from './decorator/roles.decorator';
+import { Role } from './enum/roles.enum';
+import { User } from 'src/user/schemas/user.schemas'
 
 @ApiTags('Login')
 @Controller('login')
@@ -21,9 +24,10 @@ export class LoginController {
     return {id: req.user.id, name: req.user.name, email: req.user.email};
   }
 
-  @LoginAuth()
   @Get()
-  getProfile(@Req() req){
-    return {id: req.user.id, name: req.user.name, email: req.user.email};
+  @Roles(Role.OWNER)
+  async getProfile(@Req() req){
+    const login = await this.loginService.getingUserById(req.user.id);
+    return {id: req.user.id, name: req.user.name, email: login.email};
   }
 }
