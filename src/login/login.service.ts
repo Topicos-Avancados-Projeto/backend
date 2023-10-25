@@ -29,7 +29,6 @@ export class LoginService {
     if (!login || !(await bcrypt.compare(password, login.password))) {
       throw new UnauthorizedException('Incorrect CPF or Password!');
     }
-
     return {
       id: login._id,
       name: login.name,
@@ -46,4 +45,9 @@ export class LoginService {
     });
     return { token };
   }
+  
+  async getingUserById(id: any){
+        const login = await this.userModel.findById(id);
+        return login;
+    }
 }

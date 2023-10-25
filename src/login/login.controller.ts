@@ -23,7 +23,8 @@ export class LoginController {
 
   @Get()
   @Roles(Role.OWNER)
-  getProfile(@Req() req) {
-    return { id: req.user.id, name: req.user.name, email: req.user.email };
+  async getProfile(@Req() req){
+    const login = await this.loginService.getingUserById(req.user.id);
+    return {id: req.user.id, name: req.user.name, email: login.email};
   }
 }
