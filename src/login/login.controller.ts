@@ -6,6 +6,7 @@ import { JwtAuth } from './decorator/jwt.auth.decorator';
 import { Public } from './decorator/public.auth.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { Role } from './enum/roles.enum';
+import { LoginAuth } from './decorator/login.auth.decorator';
 
 @ApiTags('Login')
 @Controller('login')
@@ -15,6 +16,7 @@ export class LoginController {
 
   @Post()
   @Public()
+  @LoginAuth()
   async peformLogin(@Req() req, @Res({ passthrough: true }) res: Response) {
     const login = await this.loginService.generateToken(req.user);
     res.set('Authorization', login.token);
