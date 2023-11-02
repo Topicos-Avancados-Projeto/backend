@@ -6,11 +6,9 @@ import { UserSchema } from './schemas/user.schemas';
 import { UserOwnershipChecker } from './owner/user.ownership.checker';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-  ],
-  controllers: [UserController, ],
+  imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
+  controllers: [UserController],
   providers: [UserService, UserOwnershipChecker],
   exports: [UserService, UserOwnershipChecker],
 })
-export class UserModule { }
+export class UserModule {}

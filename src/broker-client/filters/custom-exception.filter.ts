@@ -19,7 +19,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof ConflictException) {
       status = HttpStatus.CONFLICT;
-      msg = 'Broker Client already exists!';
+      msg = 'Broker Client Already exists!';
     } else if (exception instanceof UnprocessableEntityException) {
       status = HttpStatus.UNPROCESSABLE_ENTITY;
       msg = 'Syntax Error!';
@@ -31,7 +31,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       msg = 'Broker Client do not have permission!';
     } else if (exception instanceof NotFoundException) {
       status = HttpStatus.NOT_FOUND;
-      msg = exception.message;
+      msg = 'Broker Client not found.';
     }
 
     response.status(status).json({

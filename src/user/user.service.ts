@@ -55,7 +55,7 @@ export class UserService {
       name.length <= 3 ||
       cpf.length < 3 ||
       email.length <= 3 ||
-      password.length <= 6 ||
+      password.length < 6 ||
       date_of_birth.length <= 3
     ) {
       throw new UnprocessableEntityException('Validation problem');
