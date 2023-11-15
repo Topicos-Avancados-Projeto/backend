@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LoginModule } from './login/login.module';
 import { BrokerClientModule } from './broker-client/broker-client.module';
+import { DeviceTypesModule } from './device-types/device-types.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { BrokerClientModule } from './broker-client/broker-client.module';
     UserModule,
     LoginModule,
     BrokerClientModule,
+    DeviceTypesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
