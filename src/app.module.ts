@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LoginModule } from './login/login.module';
 import { BrokerClientModule } from './broker-client/broker-client.module';
 import { DeviceModule } from './device/device.module';
+import { DeviceTypesModule } from './device-types/device-types.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DeviceModule } from './device/device.module';
     LoginModule,
     BrokerClientModule,
     DeviceModule,
+    DeviceTypesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
