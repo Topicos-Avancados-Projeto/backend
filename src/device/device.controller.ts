@@ -6,9 +6,10 @@ import { Role } from 'src/login/enum/roles.enum';
 import { DeviceGet } from './dto/device_get_schema.dto';
 import { Types } from 'mongoose';
 import { Device } from './schemas/device.schema';
-import { NotFoundError } from 'rxjs';
+import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
 
 @Controller('device')
+@JwtAuth()
 export class DeviceController {
     constructor(private readonly deviceService: DeviceService){}
 
