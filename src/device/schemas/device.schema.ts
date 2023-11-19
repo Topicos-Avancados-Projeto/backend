@@ -8,17 +8,20 @@ export class Device extends Document{
     @Prop({ required: true })
     name: string
 
-    @Prop()
+    @Prop({required: true})
     description: string
 
-    @Prop()
+    @Prop({required: true})
     group: UUID
 
-    @Prop()
+    @Prop({required: true})
     topics: UUID
 
-    @Prop()
+    @Prop({required: true})
     type: UUID
+
+    @Prop({required: true})
+    attributes: Map<string, string>;
 }
 
 export const DeviceSchema = SchemaFactory.createForClass(Device);

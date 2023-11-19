@@ -7,17 +7,26 @@ export class DeviceGet{
     name: string
 
     @IsString()
+    @IsNotEmpty()
     description: string
 
     @IsUUID()
+    @IsNotEmpty()
     id: UUID
 
     @IsUUID()
+    @IsNotEmpty()
     group: UUID
 
     @IsUUID()
+    @IsNotEmpty()
     topics: UUID
 
     @IsUUID()
+    @IsNotEmpty()
     type: UUID
+
+    @IsObject()
+    @IsNotEmpty()
+    attributes: Map<string, string>;
 }
