@@ -1,19 +1,16 @@
 import {
-  BadRequestException,
-  ConflictException,
   Injectable,
+  ConflictException,
   NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Role } from 'src/login/enum/roles.enum';
 import { User } from './schemas/user.schemas';
+import { InjectModel } from '@nestjs/mongoose';
+import { LoginService } from 'src/login/login.service';
+import { User_post_schema } from './dto/create-user.dto';
 import mongoose, { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { User_post_schema } from './dto/create-user.dto';
-import { Request } from 'express';
-import { LoginService } from 'src/login/login.service';
-import { Role } from 'src/login/enum/roles.enum';
 
 @Injectable()
 export class UserService {
@@ -72,7 +69,7 @@ export class UserService {
       email,
       password: hashedPassword,
       date_of_birth,
-      role: Role.ADMIN,
+      role: Role.USER,
     });
     if (!user) {
       throw new NotFoundException('User not found.');
