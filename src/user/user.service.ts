@@ -11,7 +11,6 @@ import { User } from './schemas/user.schemas';
 import mongoose, { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User_post_schema } from './dto/create-user.dto';
-import { JwtPayload } from './jwt/jwt-payload.model';
 import { Request } from 'express';
 import { LoginService } from 'src/login/login.service';
 import { Role } from 'src/login/enum/roles.enum';
@@ -52,7 +51,7 @@ export class UserService {
       !email ||
       !password ||
       !date_of_birth ||
-      name.length <= 3 ||
+      name.length < 3 ||
       cpf.length < 3 ||
       email.length <= 3 ||
       password.length < 6 ||
@@ -73,7 +72,7 @@ export class UserService {
       email,
       password: hashedPassword,
       date_of_birth,
-      role: Role.USER,
+      role: Role.ADMIN,
     });
     if (!user) {
       throw new NotFoundException('User not found.');
@@ -164,26 +163,5 @@ export class UserService {
     Object.assign(document, partialUpdate);
     const updatedDocument = await document.save();
     return updatedDocument;
-  }
-
-  private static jwtExtractor(request: Request): string {
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      throw new BadRequestException('Bad request.');
-    }
-    const [, token] = authHeader.split(' ');
-    return token;
-  }
-
-  public returnJwtExtractor(): (request: Request) => string {
-    return UserService.jwtExtractor;
-  }
-
-  public async validateUser(jwtPayload: JwtPayload): Promise<User> {
-    const user = await this.userModel.findOne({ _id: jwtPayload.userId });
-    if (!user) {
-      throw new UnauthorizedException('User not found.');
-    }
-    return user;
   }
 }
