@@ -6,14 +6,20 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LoginModule } from './login/login.module';
 import { BrokerClientModule } from './broker-client/broker-client.module';
+import { DeviceModule } from './device/device.module';
+import { DeviceTypesModule } from './device-types/device-types.module';
+import { DeviceGroupModule } from './device-group/device-group.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.ATLAS_URI),
     UserModule,
     LoginModule,
-    BrokerClientModule
+    BrokerClientModule,
+    DeviceModule,
+    DeviceTypesModule,
+    DeviceGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

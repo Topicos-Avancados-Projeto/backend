@@ -1,5 +1,0 @@
-export enum QoSLevelName {
-  AT_MOST_ONCE = 'AT_MOST_ONCE',
-  AT_LEAST_ONCE = 'AT_LEAST_ONCE',
-  EXACTLY_ONCE = 'EXACTLY_ONCE',
-}

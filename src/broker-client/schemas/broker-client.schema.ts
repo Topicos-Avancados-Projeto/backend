@@ -1,49 +1,90 @@
 import * as mongoose from 'mongoose';
-import { QoSLevel } from '../dtos/qosEnum.dto';
-import { QoSLevelName } from '../dtos/qosName.dto';
 
-export const BrokerClientSchema = new mongoose.Schema({
-  cleansession: {
-    type: Boolean,
-  },
-  name: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
-  broker_port: {
-    type: Number,
-  },
-  broker_host: {
-    type: String,
-  },
-  username: {
-    type: String,
-  },
-  password: {
-    type: String,
-  },
-  version: {
-    type: Number,
-  },
-  lastwilltopic: {
-    type: String,
-  },
-  lastwillqos: {
-    type: {
+const reverseQoSLevel = {
+  0: 'AT_MOST_ONCE',
+  1: 'AT_LEAST_ONCE',
+  2: 'EXACTLY_ONCE',
+};
+
+export const BrokerClientSchema = new mongoose.Schema(
+  {
+    user_id: {
+      type: String,
+      trim: true,
+    },
+    cleansession: {
+      type: Boolean,
+      required: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    broker_port: {
       type: Number,
-      enum: QoSLevel,
-      names: QoSLevelName,
+      required: true,
+    },
+    broker_host: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    username: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    password: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    version: {
+      type: Number,
+      required: false,
+    },
+    lastwilltopic: {
+      type: String,
+      trim: true,
+    },
+    lastwillqos: {
+      type: Number,
+      enum: [0, 1, 2],
+    },
+    lastwillmessage: {
+      type: String,
+      trim: true,
+    },
+    lastwillretain: {
+      type: Boolean,
+      required: true,
+    },
+    keepalive: {
+      type: Number,
+      required: true,
     },
   },
-  lastwillmessage: {
-    type: String,
+  {
+    toJSON: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        ret.id_client = ret._id.toString();
+        ret.version = ret.__v;
+        delete ret._id;
+        delete ret.__v;
+
+        if (ret.lastwillqos !== undefined) {
+          ret.lastwillqos = {
+            value: ret.lastwillqos,
+            name: reverseQoSLevel[ret.lastwillqos],
+          };
+        }
+      },
+    },
+    id: false,
   },
-  lastwillretain: {
-    type: Boolean,
-  },
-  keepalive: {
-    type: Number,
-  },
-});
+);

@@ -1,36 +1,33 @@
-import { 
-    Body,
-    Controller,
-    Get,
-    Post,
-    Request,
-    UseGuards} from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Header } from '@nestjs/common';
 import { LoginService } from './login.service';
-import { login_post_schema } from './dto/login_post_schema.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from './local-auth.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { JwtAuth } from './decorator/jwt.auth.decorator';
+import { Public } from './decorator/public.auth.decorator';
+import { Roles } from './decorator/roles.decorator';
+import { Role } from './enum/roles.enum';
+import { LoginAuth } from './decorator/login.auth.decorator';
 
 @ApiTags('Login')
 @Controller('login')
+@JwtAuth()
 export class LoginController {
-    constructor(private loginService: LoginService){}
-   
-    //@UseGuards(LocalAuthGuard)
-    @Post('login')
-    @ApiResponse({status: 401, description: 'Incorrect CPF or Password!'})
-    @ApiResponse({status: 400, description: 'Malformed request. Check the sent data.'})
-    @ApiResponse({status: 422, description: 'Validation Problem.'})
-    async peformLogin(@Body() loginDto: login_post_schema): Promise<{ token: string }>{
-        return this.loginService.generateToken(loginDto)
-    }
+  constructor(private loginService: LoginService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    @Get('login')
-    @ApiResponse({status: 401, description: 'User not logged in!'})
-    @ApiResponse({status: 403, description: 'Access forbidden for this user.'})
-    async loggedUser(@Request() req): Promise <any>{
-        return req.user;
-    }
+  @Post()
+  @Public()
+  @LoginAuth()
+  @Header('Access-Control-Expose-Headers', 'Authorization')
+  async peformLogin(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const login = await this.loginService.generateToken(req.user);
+    res.set('Authorization', login.token);
+    return { id: req.user.id, name: req.user.name, email: req.user.email };
+  }
+
+  @Get()
+  @Roles(Role.OWNER)
+  async getProfile(@Req() req){
+    const login = await this.loginService.getingUserById(req.user.id);
+    return {id: req.user.id, name: req.user.name, email: login.email};
+  }
 }

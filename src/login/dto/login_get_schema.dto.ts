@@ -1,8 +1,16 @@
+import { IsNotEmpty, IsString } from "class-validator"
+
 export class login_get_schema{
+
+    @IsNotEmpty()
+    @IsString()
     id: string
+
+    @IsNotEmpty()
+    @IsString()
     name: string
-    email: {
-        type: string
-        reading: true
-    }
+
+    @IsNotEmpty()
+    @IsString()
+    email: string
 }
