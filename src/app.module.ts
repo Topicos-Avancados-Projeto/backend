@@ -8,6 +8,7 @@ import { LoginModule } from './login/login.module';
 import { BrokerClientModule } from './broker-client/broker-client.module';
 import { DeviceModule } from './device/device.module';
 import { DeviceTypesModule } from './device-types/device-types.module';
+import { DeviceGroupModule } from './device-group/device-group.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DeviceTypesModule } from './device-types/device-types.module';
     BrokerClientModule,
     DeviceModule,
     DeviceTypesModule,
+    DeviceGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

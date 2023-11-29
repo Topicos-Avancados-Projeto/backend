@@ -83,7 +83,7 @@ export class UserService {
   }
 
   public async findAll(): Promise<User[]> {
-    return this.userModel.find();
+    return this.userModel.find().limit(10);
   }
 
   public async findById(id: string): Promise<User> {
