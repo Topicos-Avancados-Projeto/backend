@@ -1,20 +1,16 @@
 import {
-  BadRequestException,
-  ConflictException,
   Injectable,
+  ConflictException,
   NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Role } from 'src/login/enum/roles.enum';
 import { User } from './schemas/user.schemas';
+import { InjectModel } from '@nestjs/mongoose';
+import { LoginService } from 'src/login/login.service';
+import { User_post_schema } from './dto/create-user.dto';
 import mongoose, { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { User_post_schema } from './dto/create-user.dto';
-import { JwtPayload } from './jwt/jwt-payload.model';
-import { Request } from 'express';
-import { LoginService } from 'src/login/login.service';
-import { Role } from 'src/login/enum/roles.enum';
 
 @Injectable()
 export class UserService {
@@ -52,7 +48,7 @@ export class UserService {
       !email ||
       !password ||
       !date_of_birth ||
-      name.length <= 3 ||
+      name.length < 3 ||
       cpf.length < 3 ||
       email.length <= 3 ||
       password.length < 6 ||
@@ -87,7 +83,7 @@ export class UserService {
   }
 
   public async findAll(): Promise<User[]> {
-    return this.userModel.find();
+    return this.userModel.find().limit(10);
   }
 
   public async findById(id: string): Promise<User> {
@@ -164,26 +160,5 @@ export class UserService {
     Object.assign(document, partialUpdate);
     const updatedDocument = await document.save();
     return updatedDocument;
-  }
-
-  private static jwtExtractor(request: Request): string {
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      throw new BadRequestException('Bad request.');
-    }
-    const [, token] = authHeader.split(' ');
-    return token;
-  }
-
-  public returnJwtExtractor(): (request: Request) => string {
-    return UserService.jwtExtractor;
-  }
-
-  public async validateUser(jwtPayload: JwtPayload): Promise<User> {
-    const user = await this.userModel.findOne({ _id: jwtPayload.userId });
-    if (!user) {
-      throw new UnauthorizedException('User not found.');
-    }
-    return user;
   }
 }

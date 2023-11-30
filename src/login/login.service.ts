@@ -29,20 +29,11 @@ export class LoginService {
     if (!login || !(await bcrypt.compare(password, login.password))) {
       throw new UnauthorizedException('Incorrect CPF or Password!');
     }
-    return {
-      id: login._id,
-      name: login.name,
-      email: login.email,
-      role: login.role,
-    };
+    return {id: login._id, name: login.name, email: login.email, role: login.role};
   }
 
   generateToken(user: any) {
-    const token = this.jwtService.sign({
-      sub: user.id,
-      name: user.name,
-      role: user.role,
-    });
+    const token = this.jwtService.sign({sub: user.id, name: user.name, role: user.role});
     return { token };
   }
   
