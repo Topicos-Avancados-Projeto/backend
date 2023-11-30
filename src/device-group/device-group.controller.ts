@@ -1,34 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from '@nestjs/common';
 import { DeviceGroupService } from './device-group.service';
-import { CreateDeviceGroupDto } from './dto/create-device-group.dto';
-import { UpdateDeviceGroupDto } from './dto/update-device-group.dto';
+import { DeviceGroupPostSchema } from './dto/devices_group_post_schema.dto';
+import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
+import { Roles } from 'src/login/decorator/roles.decorator';
+import { Role } from 'src/login/enum/roles.enum';
 
-@Controller('device-group')
+@Controller('device_group')
+@JwtAuth()
 export class DeviceGroupController {
   constructor(private readonly deviceGroupService: DeviceGroupService) {}
 
   @Post()
-  create(@Body() createDeviceGroupDto: CreateDeviceGroupDto) {
-    return this.deviceGroupService.create(createDeviceGroupDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.deviceGroupService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.deviceGroupService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeviceGroupDto: UpdateDeviceGroupDto) {
-    return this.deviceGroupService.update(+id, updateDeviceGroupDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deviceGroupService.remove(+id);
+  @Roles(Role.ADMIN, Role.USER)
+  @HttpCode(HttpStatus.OK)
+  create(@Body() deviceGroupPostDto: DeviceGroupPostSchema) {
+    return this.deviceGroupService.create(deviceGroupPostDto);
   }
 }
