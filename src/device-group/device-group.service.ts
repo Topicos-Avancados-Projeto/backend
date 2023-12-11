@@ -14,8 +14,6 @@ export class DeviceGroupService {
   constructor(
     @InjectModel('DeviceGroup')
     private deviceGroupModel: Model<DeviceGroup>,
-    // @InjectModel('Device')
-    // private deviceModel: Model<Device>,
   ) {}
 
   public async isIdUnique(id: any): Promise<boolean> {
@@ -39,7 +37,11 @@ export class DeviceGroupService {
   }
 
   public async list(): Promise<DeviceGroup[]> {
-    return this.deviceGroupModel.find().sort({ createdAt: -1 }).limit(10).exec();
+    return this.deviceGroupModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .exec();
   }
 
   public async findById(id: string): Promise<DeviceGroup> {
@@ -98,26 +100,28 @@ export class DeviceGroupService {
     }
     return document;
   }
-  
+
   public async deleteById(id: string): Promise<DeviceGroup> {
     const document = await this.findById(id);
     if (!document) {
       throw new NotFoundException(`User not found.`);
     }
-    const deletedDocument = await this.deviceGroupModel.findByIdAndRemove(id).exec();
+    const deletedDocument = await this.deviceGroupModel
+      .findByIdAndRemove(id)
+      .exec();
     return deletedDocument;
   }
-  
-    async deleteByIndex(index: number): Promise<DeviceGroup | null> {
-      const document = await this.deviceGroupModel
-        .findOne()
-        .sort({ createdAt: -1 })
-        .skip(index - 1)
-        .exec();
-      if (!document) {
-        return null;
-      }
-      await document.deleteOne();
-      return document;
+
+  async deleteByIndex(index: number): Promise<DeviceGroup | null> {
+    const document = await this.deviceGroupModel
+      .findOne()
+      .sort({ createdAt: -1 })
+      .skip(index - 1)
+      .exec();
+    if (!document) {
+      return null;
     }
+    await document.deleteOne();
+    return document;
+  }
 }
