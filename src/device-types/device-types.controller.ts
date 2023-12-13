@@ -18,13 +18,13 @@ import { CreateDeviceTypeDto } from './dto/create-device-type.dto';
 import { UpdateDeviceTypeDto } from './dto/update-device-type.dto';
 import { DeviceType } from './models/device-type.model';
 import { Types } from 'mongoose';
-import { CustomExceptionFilter } from 'src/device-types/filters/custom-exception.filter';
+// import { CustomExceptionFilter } from 'src/device-types/filters/custom-exception.filter';
 import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
 import { Role } from 'src/login/enum/roles.enum';
 import { Roles } from 'src/login/decorator/roles.decorator';
 
 @Controller('type')
-@UseFilters(CustomExceptionFilter)
+// @UseFilters(CustomExceptionFilter)
 @JwtAuth()
 export class DeviceTypesController {
   constructor(private readonly typeService: DeviceTypesService) {}
