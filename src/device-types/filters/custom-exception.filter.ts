@@ -7,6 +7,7 @@ import {
   ForbiddenException,
   UnauthorizedException,
   UnprocessableEntityException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -32,6 +33,9 @@ export class CustomExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof NotFoundException) {
       status = HttpStatus.NOT_FOUND;
       msg = 'Device types not found.';
+    } else if (exception instanceof BadRequestException) {
+      status = HttpStatus.CONFLICT;
+      msg = 'Validation problem';
     }
 
     response.status(status).json({

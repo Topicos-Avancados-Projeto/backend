@@ -23,14 +23,19 @@ import { DtoUpdate } from './dtos/update.dto';
 import { Types } from 'mongoose';
 import { Response } from 'express';
 import { CustomExceptionFilter } from './filters/custom-exception.filter';
+import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
+import { Roles } from 'src/login/decorator/roles.decorator';
+import { Role } from 'src/login/enum/roles.enum';
 
 @Controller('broker_client')
 @UseFilters(CustomExceptionFilter)
+@JwtAuth()
 export class BrokerClientController {
   constructor(private readonly clientService: BrokerClientService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(Role.OWNER, Role.ADMIN)
   public async register(
     @Body() registerDto: RegisterDto,
     @Res() response: Response,
@@ -42,6 +47,7 @@ export class BrokerClientController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<BrokerClient[]> {
     const clients = await this.clientService.findAll();
@@ -49,6 +55,7 @@ export class BrokerClientController {
   }
 
   @Get(':param')
+  @Roles(Role.OWNER, Role.ADMIN)
   async getUser(@Param('param') param: string) {
     const parsedParam = Types.ObjectId.isValid(param) ? param : null;
     const index = !parsedParam ? parseInt(param, 10) : null;
@@ -66,6 +73,7 @@ export class BrokerClientController {
 
   @Delete(':param')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(Role.OWNER, Role.ADMIN)
   public async delete(@Param('param') param: string): Promise<void> {
     const parsedParam = Types.ObjectId.isValid(param) ? param : null;
     const index = !parsedParam ? parseInt(param, 10) : null;
@@ -82,6 +90,7 @@ export class BrokerClientController {
   }
 
   @Patch(':param')
+  @Roles(Role.OWNER, Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async update(
     @Param('param') param: string,

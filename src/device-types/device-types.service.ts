@@ -25,7 +25,8 @@ export class DeviceTypesService {
     const type = new this.typeModel(createDeviceTypeDto);
 
     try {
-      return await type.save();
+      await type.save();
+      return type;
     } catch (error) {
       throw new UnprocessableEntityException('Failed to register the type.');
     }
