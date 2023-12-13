@@ -7,7 +7,7 @@ export class DeviceGroup extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Device' })
+  @Prop({ type: [], ref: 'Device' })
   devices: Device;
 
   @Prop()
