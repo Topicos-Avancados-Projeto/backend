@@ -19,13 +19,18 @@ import { UpdateDeviceTypeDto } from './dto/update-device-type.dto';
 import { DeviceType } from './models/device-type.model';
 import { Types } from 'mongoose';
 import { CustomExceptionFilter } from 'src/device-types/filters/custom-exception.filter';
+import { JwtAuth } from 'src/login/decorator/jwt.auth.decorator';
+import { Role } from 'src/login/enum/roles.enum';
+import { Roles } from 'src/login/decorator/roles.decorator';
 
 @Controller('type')
 @UseFilters(CustomExceptionFilter)
+@JwtAuth()
 export class DeviceTypesController {
   constructor(private readonly typeService: DeviceTypesService) {}
 
   @Post()
+  @Roles(Role.OWNER, Role.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   public async create(
     @Body() createDto: CreateDeviceTypeDto,
@@ -38,6 +43,7 @@ export class DeviceTypesController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   public async findAll(): Promise<DeviceType[]> {
     const type = await this.typeService.findAll();
@@ -45,6 +51,7 @@ export class DeviceTypesController {
   }
 
   @Get(':param')
+  @Roles(Role.OWNER, Role.ADMIN)
   async findOne(@Param('param') param: string) {
     const parsedParam = Types.ObjectId.isValid(param) ? param : null;
     const index = !parsedParam ? parseInt(param, 10) : null;
@@ -61,7 +68,8 @@ export class DeviceTypesController {
   }
 
   @Patch(':param')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(Role.OWNER, Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
   public async update(
     @Param('param') param: string,
     @Body() updateDto: UpdateDeviceTypeDto,
@@ -81,6 +89,7 @@ export class DeviceTypesController {
   }
 
   @Delete(':param')
+  @Roles(Role.OWNER, Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(@Param('param') param: string): Promise<void> {
     const parsedParam = Types.ObjectId.isValid(param) ? param : null;

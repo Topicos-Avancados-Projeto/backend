@@ -14,8 +14,12 @@ export const DeviceTypeSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        ret.id = ret._id.toString();
+        const _id = ret._id;
         delete ret._id;
+        const transformed = { ...ret };
+        transformed._id = _id;
+
+        return transformed;
       },
     },
     id: false,
