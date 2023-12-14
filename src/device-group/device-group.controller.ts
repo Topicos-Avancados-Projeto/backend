@@ -27,19 +27,20 @@ export class DeviceGroupController {
 
   @Post()
   @Roles(Role.ADMIN, Role.USER)
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() deviceGroupPostDto: DeviceGroupPostSchema) {
     return this.deviceGroupService.create(deviceGroupPostDto);
   }
 
   @Get()
-  @Roles(Role.ADMIN, Role.USER)
   @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN, Role.USER)
   public find() {
     return this.deviceGroupService.list();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   @Roles(Role.ADMIN, Role.USER)
   async getUser(@Param('id') param: string) {
     if (Types.ObjectId.isValid(param)) {

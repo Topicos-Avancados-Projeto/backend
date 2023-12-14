@@ -29,9 +29,7 @@ export class DeviceGroupService {
     attributes: Map<string, string>;
   }> {
     const { name, devices, description, attributes } = deviceGroupDto;
-    if (!name || !devices || !description || !attributes) {
-      throw new UnprocessableEntityException('Validation Problem');
-    }
+    if (!name || !devices || !description || !attributes) throw new UnprocessableEntityException('Validation Problem');
     const deviceGroup = await this.deviceGroupModel.create(deviceGroupDto);
     return { id: deviceGroup._id, name, devices, description, attributes };
   }
