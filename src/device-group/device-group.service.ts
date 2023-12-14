@@ -22,7 +22,7 @@ export class DeviceGroupService {
   }
 
   public async create(deviceGroupDto: DeviceGroupPostSchema): Promise<{
-    id: any;
+    _id: any;
     name: string;
     devices: Device;
     description: string;
@@ -31,7 +31,7 @@ export class DeviceGroupService {
     const { name, devices, description, attributes } = deviceGroupDto;
     if (!name || !devices || !description || !attributes) throw new UnprocessableEntityException('Validation Problem');
     const deviceGroup = await this.deviceGroupModel.create(deviceGroupDto);
-    return { id: deviceGroup._id, name, devices, description, attributes };
+    return { _id: deviceGroup._id, name, devices, description, attributes };
   }
 
   public async list(): Promise<DeviceGroup[]> {
